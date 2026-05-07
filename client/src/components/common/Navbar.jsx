@@ -44,7 +44,7 @@ import { FaUtensils, FaStore, FaCrown, FaRegGem, FaChartLine } from 'react-icons
 import { GiFoodChain, GiMeal, GiCoffeeCup, GiCakeSlice, GiFoodTruck } from 'react-icons/gi';
 import { LogIn, UserCircle, ShoppingBag, LayoutDashboard, Crown } from 'lucide-react';
 import axios from 'axios';
-import { userAPI } from '../../services/api';
+import { userAPI, shopAPI, locationAPI } from '../../services/api';
 
 const Navbar = () => {
   const { user, logout, login } = useAuth();
@@ -56,6 +56,7 @@ const Navbar = () => {
   const [loginDropdownOpen, setLoginDropdownOpen] = useState(false);
   const [locationDropdownOpen, setLocationDropdownOpen] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState(null);
+  const [shopLocations, setShopLocations] = useState([]);
   const [userStats, setUserStats] = useState({
     totalOrders: 0,
     activeSubscriptions: 0,
@@ -135,6 +136,33 @@ const Navbar = () => {
     }
   };
 
+  const loadShopLocations = async () => {
+    try {
+      const response = await shopAPI.getShops();
+      if (response.data.success && Array.isArray(response.data.shops)) {
+        const unique = new Map();
+        response.data.shops.forEach((shop) => {
+          const city = shop.location?.city?.trim();
+          const area = shop.location?.area?.trim();
+          const lat = shop.location?.lat;
+          const lng = shop.location?.lng;
+          if (!city || !lat || !lng) return;
+          const address = area && area !== city ? `${area}, ${city}` : city;
+          if (!unique.has(address)) {
+            unique.set(address, { address, city, area, lat, lng });
+          }
+        });
+        setShopLocations(Array.from(unique.values()));
+      }
+    } catch (error) {
+      console.error('Error loading shop locations:', error);
+    }
+  };
+
+  useEffect(() => {
+    loadShopLocations();
+  }, []);
+
   // Get saved location from localStorage
   useEffect(() => {
     const savedLocation = localStorage.getItem('userLocation');
@@ -152,25 +180,33 @@ const Navbar = () => {
         async (position) => {
           const { latitude, longitude } = position.coords;
           try {
-            const response = await axios.get(
-              `https://api.opencagedata.com/geocode/v1/json?q=${latitude}+${longitude}&key=YOUR_API_KEY`
-            );
-            if (response.data.results[0]) {
-              const location = {
-                address: response.data.results[0].formatted,
-                lat: latitude,
-                lng: longitude
-              };
-              setSelectedLocation(location);
-              localStorage.setItem('userLocation', JSON.stringify(location));
-            }
+            const response = await locationAPI.reverseGeocode(latitude, longitude);
+            const addressData = response.data?.address;
+            const formattedAddress = addressData
+              ? `${addressData.area ? addressData.area + ', ' : ''}${addressData.city || ''}`.trim()
+              : 'Current Location';
+            const location = {
+              address: formattedAddress || 'Current Location',
+              lat: latitude,
+              lng: longitude,
+              city: addressData?.city || null,
+              area: addressData?.area || null,
+            };
+            setSelectedLocation(location);
+            localStorage.setItem('userLocation', JSON.stringify(location));
           } catch (error) {
             console.error('Error getting location name:', error);
+            const location = {
+              address: 'Current Location',
+              lat: latitude,
+              lng: longitude,
+            };
+            setSelectedLocation(location);
+            localStorage.setItem('userLocation', JSON.stringify(location));
           }
         },
         (error) => {
           console.error('Geolocation error:', error);
-          // Set default location
           const defaultLocation = { address: 'Select Location', lat: null, lng: null };
           setSelectedLocation(defaultLocation);
         }
@@ -294,12 +330,18 @@ const Navbar = () => {
   const currentRoleStats = roleStats[user?.role] || roleStats.customer;
 
   // Popular locations for dropdown
-  const popularLocations = [
+  const fixedPopularLocations = [
     { address: 'Wakad, Pune', lat: 18.5905, lng: 73.7659 },
     { address: 'Hinjewadi, Pune', lat: 18.5938, lng: 73.7394 },
-    { address: 'Chinchwad, Pune', lat: 18.6272, lng: 73.7926 },
+    { address: 'Chinchwad, Pune', lat: 18.6271, lng: 73.7926 },
     { address: 'Baner, Pune', lat: 18.5568, lng: 73.7816 },
-    { address: 'Kothrud, Pune', lat: 18.5071, lng: 73.8091 }
+    { address: 'Kothrud, Pune', lat: 18.5071, lng: 73.8091 },
+    { address: 'Kolhapur, Maharashtra', lat: 16.7050, lng: 74.2410 }
+  ];
+
+  const popularLocations = [
+    ...fixedPopularLocations,
+    ...shopLocations.filter(loc => !fixedPopularLocations.some(base => base.address === loc.address))
   ];
 
   return (
@@ -311,8 +353,8 @@ const Navbar = () => {
           <Link to="/" className="flex items-center gap-2.5 group shrink-0">
             <div className="relative h-12 w-12 rounded-full overflow-hidden border border-gray-200 dark:border-gray-700">
               <img
-                src="/mahii1logo.jpeg"
-                alt="Mahii1 Logo"
+                src="/mahiilogo.png"
+                alt="Mahii Logo"
                 className="h-full w-full object-cover group-hover:scale-105 transition"
               />
             </div>
@@ -581,8 +623,8 @@ const Navbar = () => {
                 {loginDropdownOpen && (
                   <div className="absolute right-0 mt-3 w-80 bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-100 dark:border-gray-700 z-50 overflow-hidden animate-in slide-in-from-top-2 duration-200">
                     <div className="p-5 text-center border-b border-gray-100 dark:border-gray-700">
-                      <div className="w-16 h-16 mx-auto mb-3 bg-gradient-to-r from-[#C2185B]/10 to-[#ad1457]/10 rounded-full flex items-center justify-center">
-                        <GiFoodChain className="text-3xl text-[#C2185B]" />
+                      <div className="w-16 h-16 mx-auto mb-3 rounded-full overflow-hidden border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 flex items-center justify-center">
+                        <img src="/mahiilogo.png" alt="Mahii Logo" className="h-12 w-12 object-contain" />
                       </div>
                       <h3 className="text-xl font-bold text-gray-900 dark:text-white">Welcome back</h3>
                       <p className="text-sm text-gray-500 mt-1">Sign in to continue your food journey</p>
@@ -590,7 +632,7 @@ const Navbar = () => {
                     
                     {/* Google Sign In Button */}
                     <button
-                      className="w-full flex items-center justify-center gap-3 px-4 py-3 m-2 w-[calc(100%-16px)] bg-white border border-gray-300 dark:border-gray-600 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition shadow-sm disabled:opacity-50"
+                      className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-white border border-gray-300 dark:border-gray-600 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition shadow-sm disabled:opacity-50"
                       onClick={handleGoogleSignIn}
                       disabled={googleLoading}
                     >
@@ -618,11 +660,25 @@ const Navbar = () => {
                         <GiMeal size={20} className="text-orange-600" />
                       </div>
                       <div>
-                        <p className="font-semibold text-gray-900 dark:text-white">Email Sign In</p>
-                        <p className="text-xs text-gray-500">Use your email & password</p>
+                        <p className="font-semibold text-gray-900 dark:text-white">Customer Login</p>
+                        <p className="text-xs text-gray-500">Sign in with email and password</p>
                       </div>
                     </Link>
-                    
+
+                    <Link
+                      to="/login/shopowner"
+                      className="flex items-center gap-3 px-5 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 transition"
+                      onClick={() => setLoginDropdownOpen(false)}
+                    >
+                      <div className="w-10 h-10 rounded-xl bg-teal-100 dark:bg-teal-900/30 flex items-center justify-center">
+                        <FaStore size={18} className="text-teal-600" />
+                      </div>
+                      <div>
+                        <p className="font-semibold text-teal-600">Shop Owner Login</p>
+                        <p className="text-xs text-gray-500">Access your shop dashboard</p>
+                      </div>
+                    </Link>
+
                     <div className="border-t border-gray-100 dark:border-gray-700 my-2"></div>
                     
                     <Link
@@ -790,10 +846,10 @@ const Navbar = () => {
                   <button
                     onClick={handleGoogleSignIn}
                     disabled={googleLoading}
-                    className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-white border border-gray-300 dark:border-gray-600 rounded-xl mb-2 disabled:opacity-50"
+                    className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-white border border-gray-300 dark:border-gray-600 rounded-xl mb-2 hover:bg-gray-50 dark:hover:bg-gray-700 transition disabled:opacity-50"
                   >
                     <img src="https://www.google.com/favicon.ico" alt="Google" className="w-4 h-4" />
-                    <span className="text-sm">{googleLoading ? 'Signing in...' : 'Continue with Google'}</span>
+                    <span className="text-sm text-gray-700 dark:text-gray-300">{googleLoading ? 'Signing in...' : 'Continue with Google'}</span>
                   </button>
                   <Link to="/login/customer" className="flex items-center gap-3 py-3 px-2" onClick={() => setMobileMenuOpen(false)}>
                     <GiMeal size={18} /> Email Login

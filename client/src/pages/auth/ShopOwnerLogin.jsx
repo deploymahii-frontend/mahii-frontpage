@@ -17,8 +17,9 @@ const ShopOwnerLogin = () => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
   const [error, setError] = useState('');
-  const { login } = useAuth();
+  const { login, googleLogin } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -41,6 +42,22 @@ const ShopOwnerLogin = () => {
     }
   };
 
+  const handleGoogleLogin = async () => {
+    setGoogleLoading(true);
+    try {
+      const result = await googleLogin('shopowner');
+      if (result.success) {
+        if (result.user.isApproved) {
+          navigate('/shop/dashboard');
+        } else {
+          navigate('/shop/pending-approval');
+        }
+      }
+    } finally {
+      setGoogleLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-emerald-100 dark:from-gray-900 dark:to-gray-800 py-12 px-4 sm:px-6 lg:px-8">
       <motion.div
@@ -48,11 +65,10 @@ const ShopOwnerLogin = () => {
         animate={{ opacity: 1, y: 0 }}
         className="max-w-md w-full space-y-8 bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-2xl"
       >
-        {/* Header */}
+        <div className="flex justify-center">
+          <img src="/mahiilogo.png" alt="Mahii Logo" className="h-16 w-16 object-contain" />
+        </div>
         <div className="text-center">
-          <div className="mx-auto w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-2xl flex items-center justify-center mb-4">
-            <Store className="w-8 h-8 text-green-600 dark:text-green-400" />
-          </div>
           <h2 className="text-3xl font-bold text-gray-900 dark:text-white">Shop Owner Login</h2>
           <p className="mt-2 text-gray-600 dark:text-gray-400">Access your business dashboard</p>
         </div>
@@ -171,11 +187,32 @@ const ShopOwnerLogin = () => {
             <div className="w-full border-t border-gray-300 dark:border-gray-600"></div>
           </div>
           <div className="relative flex justify-center text-sm">
-            <span className="px-2 bg-white dark:bg-gray-800 text-gray-500">Other Options</span>
+            <span className="px-2 bg-white dark:bg-gray-800 text-gray-500">Or continue with</span>
           </div>
         </div>
 
-        {/* Customer Login Link */}
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <button
+            type="button"
+            onClick={handleGoogleLogin}
+            disabled={googleLoading}
+            className="w-full flex items-center justify-center gap-2 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {googleLoading ? (
+              <div className="w-5 h-5 border-2 border-gray-400 border-t-green-600 rounded-full animate-spin"></div>
+            ) : (
+              <img src="https://www.google.com/favicon.ico" alt="Google" className="w-5 h-5" />
+            )}
+            {googleLoading ? 'Signing in...' : 'Google'}
+          </button>
+          <button
+            type="button"
+            className="w-full flex items-center justify-center gap-2 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition"
+          >
+            📱 Phone
+          </button>
+        </div>
+
         <div className="text-center">
           <p className="text-gray-600 dark:text-gray-400">
             Are you a customer?{' '}

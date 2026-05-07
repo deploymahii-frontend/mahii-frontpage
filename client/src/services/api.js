@@ -69,6 +69,7 @@ export const userAPI = {
 export const shopAPI = {
   getNearbyShops: (params) => api.get('/shops/nearby', { params }),
   getExploreShops: (params) => api.get('/shops/explore', { params }),
+  getShops: (params) => api.get('/shops', { params }),
   getCategories: () => api.get('/shops/categories'),
   searchShops: (params) => api.get('/shops/search', { params }),
   getShopById: (id) => api.get(`/shops/${id}`),

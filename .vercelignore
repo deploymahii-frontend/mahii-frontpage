@@ -1,0 +1,7 @@
+server/
+gh_repo/
+docs/
+*.md
+README.md
+package-lock.json
+client/package-lock.json

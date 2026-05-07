@@ -1,0 +1,73 @@
+npm install firebase
+
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyDWK3g1wjcpWQKRTC8Mo9CoHhEMPIgkjXE",
+  authDomain: "mahii-app.firebaseapp.com",
+  projectId: "mahii-app",
+  storageBucket: "mahii-app.firebasestorage.app",
+  messagingSenderId: "511984279209",
+  appId: "1:511984279209:web:45b023b8787ecee92ed3b8"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+
+// Firebase Realtime Database Rules (upload to Firebase Console > Database > Rules)
+{
+  "rules": {
+    // Users can read/write their own data
+    "users": {
+      "$uid": {
+        ".read": "$uid === auth.uid",
+        ".write": "$uid === auth.uid"
+      }
+    },
+
+    // Orders - authenticated users can read/write
+    "orders": {
+      ".read": "auth != null",
+      ".write": "auth != null"
+    },
+
+    // Shop orders - shop owners can read their own shop's orders
+    "shopOrders": {
+      "$shopId": {
+        ".read": "auth != null && auth.token.shopId === $shopId",
+        ".write": "auth != null"
+      }
+    },
+
+    // Attendance - authenticated users can access
+    "attendance": {
+      "$subscriptionId": {
+        ".read": "auth != null",
+        ".write": "auth != null"
+      }
+    },
+
+    // Notifications - users can read their own
+    "notifications": {
+      "$userId": {
+        ".read": "$userId === auth.uid",
+        ".write": "auth != null"
+      }
+    },
+
+    // Public shop data (read-only for everyone, write for shopowners/admins)
+    "shops": {
+      ".read": true,
+      ".write": "auth != null && (auth.token.role === 'shopowner' || auth.token.role === 'admin')"
+    }
+  }
+}
+
+
+
+TEP 3: GET DATABASE URL
+https://mahii-app-default-rtdb.asia-southeast1.firebasedatabase.app/

@@ -1,0 +1,23 @@
+server/
+│
+├── config/
+│   └── db.js                      ✅ Created
+│
+├── models/
+│   ├── User.js                    ✅ Created
+│   ├── Shop.js                    ✅ Created
+│   ├── Product.js                 ✅ Created
+│   ├── Order.js                   ✅ Created
+│   └── Subscription.js            ✅ Created
+│
+├── controllers/                   (Empty - Next Step)
+├── routes/                        (Empty - Next Step)
+├── middleware/                    (Empty - Next Step)
+├── services/                      (Empty - Next Step)
+├── utils/                         (Empty - Next Step)
+├── validations/                   (Empty - Next Step)
+│
+├── server.js                      ✅ Created
+├── package.json                   ✅ Created
+├── .env                           ✅ Created
+└── .gitignore                     ✅ Created

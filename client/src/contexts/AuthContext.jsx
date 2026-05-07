@@ -1,6 +1,8 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { authAPI } from '../services/api';
 import toast from 'react-hot-toast';
+import { getAuth, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
+import { auth } from '../config/firebase';
 
 const AuthContext = createContext();
 
@@ -42,7 +44,7 @@ export const AuthProvider = ({ children }) => {
       if (role === 'admin') {
         response = await authAPI.adminLogin({ email, password, ...extra });
       } else {
-        response = await authAPI.login({ email, password, role });
+        response = await authAPI.login({ email, password, role, ...extra });
       }
       
       const { token, user } = response.data;
@@ -62,6 +64,33 @@ export const AuthProvider = ({ children }) => {
     } catch (error) {
       toast.error(error.response?.data?.message || 'Login failed');
       return { success: false, error: error.response?.data?.message };
+    }
+  };
+
+  const googleLogin = async (role = 'customer') => {
+    try {
+      const provider = new GoogleAuthProvider();
+      provider.addScope('profile');
+      provider.addScope('email');
+      
+      const result = await signInWithPopup(auth, provider);
+      const firebaseUser = result.user;
+      
+      // Get ID token from Firebase
+      const idToken = await firebaseUser.getIdToken();
+      
+      // Login with Firebase credentials
+      return await login(firebaseUser.email, '', role, {
+        firebaseUid: firebaseUser.uid,
+        idToken: idToken,
+        displayName: firebaseUser.displayName,
+        photoUrl: firebaseUser.photoURL,
+        isGoogleAuth: true
+      });
+    } catch (error) {
+      console.error('Google login error:', error);
+      toast.error(error.message || 'Google login failed');
+      return { success: false, error: error.message };
     }
   };
 
@@ -101,6 +130,7 @@ export const AuthProvider = ({ children }) => {
         loading,
         isAuthenticated: !!user,
         login,
+        googleLogin,
         customerRegister,
         logout,
         loadUser,

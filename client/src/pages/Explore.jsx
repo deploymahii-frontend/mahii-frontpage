@@ -68,6 +68,33 @@ const Explore = () => {
     if (saved) setRecentSearches(JSON.parse(saved));
   }, []);
 
+  useEffect(() => {
+    const savedLocation = localStorage.getItem('userLocation');
+    if (savedLocation) {
+      try {
+        const parsed = JSON.parse(savedLocation);
+        if (parsed?.lat && parsed?.lng) {
+          setLocation(parsed);
+        } else {
+          getLocation();
+        }
+      } catch (error) {
+        getLocation();
+      }
+    } else {
+      getLocation();
+    }
+
+    const handleLocationChange = (event) => {
+      if (event?.detail) {
+        setLocation(event.detail);
+      }
+    };
+
+    window.addEventListener('locationChanged', handleLocationChange);
+    return () => window.removeEventListener('locationChanged', handleLocationChange);
+  }, [getLocation]);
+
   const saveRecentSearch = (query) => {
     if (!query.trim()) return;
     const updated = [query, ...recentSearches.filter(s => s !== query)].slice(0, 5);
@@ -195,7 +222,6 @@ const Explore = () => {
 
   useEffect(() => {
     getLocation();
-    fetchShops();
   }, []);
 
   useEffect(() => {

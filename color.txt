@@ -1,0 +1,18 @@
+🔴 Primary Red: #FF2E4C
+🔴 Dark Red: #E5093F
+⚪ Background: #F3F3F3
+⚪ Card White: #FFFFFF
+⚫ Primary Text: #1E1E1E
+🩶 Secondary Text: #777777
+⭐ Rating Gold: #FFA41C
+🩶 Inactive Pill: #EAEAEA
+
+#C2185B
+
+Primary: #FF8A00
+Dark Gradient: #FF6A00
+Light Orange: #FFE6CC
+Background: #F5F5F5
+Text Dark: #1E1E1E
+Text Light: #6B7280
+Rating: #FFA41C

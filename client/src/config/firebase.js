@@ -1,5 +1,6 @@
 // Firebase configuration and utilities for Mahii App
 import { initializeApp } from 'firebase/app';
+import { getAnalytics } from 'firebase/analytics';
 import {
   getDatabase,
   ref,
@@ -41,6 +42,7 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
 const database = getDatabase(app);
 const auth = getAuth(app);
 const firestore = getFirestore(app);

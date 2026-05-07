@@ -132,19 +132,19 @@ const Home = () => {
     {
       title: "Exclusive Student Discount Is Live!",
       desc: "Get 20% Cashback on your first order this week.",
-      image: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600&h=400&fit=crop",
+      image: "/sliderdata/WhatsApp%20Image%202026-05-07%20at%205.13.19%20PM.jpeg",
       cta: "Claim Now"
     },
     {
       title: "Late Night Hunger?",
       desc: "Order from mess & cafes open till midnight.",
-      image: "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=600&h=400&fit=crop",
+      image: "/sliderdata/WhatsApp%20Image%202026-05-07%20at%205.13.19%20PM%20(1).jpeg",
       cta: "Order Now"
     },
     {
       title: "Budget Friendly Meals",
       desc: "Delicious meals starting from just ₹79.",
-      image: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=600&h=400&fit=crop",
+      image: "/sliderdata/WhatsApp%20Image%202026-05-07%20at%205.13.19%20PM%20(2).jpeg",
       cta: "Explore Now"
     },
   ];
@@ -413,8 +413,8 @@ const Home = () => {
         </div>
 
         {/* SLIDER SECTION */}
-        <div className="mb-20">
-          <div className="relative bg-gradient-to-r from-[#FF8A00] to-[#FF6A00] text-white rounded-[40px] overflow-hidden shadow-2xl p-10 md:p-16">
+        <div className="mb-14">
+          <div className="relative bg-gradient-to-r from-[#FF8A00] to-[#FF6A00] text-white rounded-[28px] overflow-hidden shadow-lg p-6 md:p-10">
 
             <AnimatePresence mode="wait">
               <motion.div
@@ -423,18 +423,18 @@ const Home = () => {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -40 }}
                 transition={{ duration: 0.6 }}
-                className="flex flex-col md:flex-row items-center justify-between gap-12"
+                className="flex flex-col md:flex-row items-center justify-between gap-6"
               >
-                <div className="max-w-xl">
-                  <h2 className="text-4xl font-bold leading-snug">
+                <div className="max-w-md">
+                  <h2 className="text-2xl md:text-3xl font-bold leading-snug">
                     {slides[currentSlide].title}
                   </h2>
-                  <p className="mt-6 text-white/90 text-lg">
+                  <p className="mt-3 text-white/90 text-sm md:text-base">
                     {slides[currentSlide].desc}
                   </p>
                   <button
                     onClick={() => navigate("/explore")}
-                    className="mt-8 bg-white text-[#FF8A00] px-10 py-3 rounded-full font-semibold shadow-md hover:scale-105 transition"
+                    className="mt-5 bg-white text-[#FF8A00] px-6 py-2.5 rounded-full font-semibold shadow-md hover:scale-105 transition"
                   >
                     {slides[currentSlide].cta}
                   </button>
@@ -444,7 +444,7 @@ const Home = () => {
                   <img
                     src={slides[currentSlide].image}
                     alt="slide"
-                    className="w-72 rounded-3xl shadow-2xl border border-white/20"
+                    className="w-52 rounded-3xl shadow-2xl border border-white/20"
                   />
                 </div>
               </motion.div>
