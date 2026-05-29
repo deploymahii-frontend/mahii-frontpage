@@ -5,7 +5,7 @@
   "private": true,
   "proxy": "http://127.0.0.1:10000",
   "engines": {
-    "node": "24.x"
+    "node": "18.x"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.59.16",
